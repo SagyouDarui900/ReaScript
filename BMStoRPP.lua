@@ -1,8 +1,6 @@
--- @description BMS/BME Importer for OtoMAD/DTM
--- @version 2.5
--- @author Reaper
--- @about
---   BMS/BMEファイルを読み込み、REAPERのトラックにWAV定義ごとのステムとして配置する。
+-- @description BMS/BME Importer
+-- @version 1.0
+-- @about BMS/BMEファイルを読み込み、REAPERのトラックにWAV定義ごとのステムとして配置する。
 
 local reaper = reaper
 
@@ -82,7 +80,6 @@ local function parse_bms(filepath)
     end
     file:close()
     
-    -- 各小節の開始拍（絶対位置）を計算
     local measure_start_beats = {}
     local current_measure_beat = 0.0
     for m = 0, 999 do
@@ -186,7 +183,6 @@ local function main()
     end
     table.sort(sorted_wavs, function(a, b) return a.name:lower() < b.name:lower() end)
     
-    -- ファイル名のプレフィックスを抽出してグループを作成
     local groups = {}
     local group_names = {}
     for _, w in ipairs(sorted_wavs) do
@@ -201,7 +197,6 @@ local function main()
     end
     table.sort(group_names)
     
-    -- ルートフォルダの作成
     local root_folder_idx = max_track_idx
     reaper.InsertTrackAtIndex(root_folder_idx, false)
     local root_folder_track = reaper.GetTrack(0, root_folder_idx)
@@ -209,7 +204,6 @@ local function main()
     reaper.SetMediaTrackInfo_Value(root_folder_track, "I_FOLDERDEPTH", 1)
     max_track_idx = max_track_idx + 1
 
-    -- サブグループフォルダとトラックの作成
     for i, g_name in ipairs(group_names) do
         local wavs = groups[g_name]
         
@@ -294,4 +288,4 @@ local function main()
     reaper.Undo_EndBlock("Import BMS Stems v2.4", -1)
 end
 
-main()   
+main()
